@@ -4,7 +4,7 @@ import smtplib
 import datetime
 import time
 import threading
-import oss
+import os
 from flask import Flask
 
 app = Flask(__name__)
