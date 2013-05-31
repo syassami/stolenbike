@@ -2,6 +2,21 @@ from BeautifulSoup import BeautifulSoup
 from urllib2 import urlopen               
 import smtplib
 import datetime
+import time
+import threading
+import oss
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+	text = 'This is for jackies stolen bike. '
+	if 7 < int(time.ctime()[11:13]) and int(time.ctime()[11:13]) < 23:
+		text += 'App should be sending'
+	else:
+		text += 'App should not be sending'
+	return text
 
 def scrapeAndMake(sites):
 	found = []
@@ -43,8 +58,11 @@ def send_email(toSend,recipients):
         print "failed to send mail"
 
 
-while True:
-	sites = ['http://santabarbara.craigslist.org/bia/','http://santamaria.craigslist.org/bia/','http://losangeles.craigslist.org/bia/','http://slo.craigslist.org/bia/','http://orangecounty.craigslist.org/bia']
-	foundbikes = scrapeAndMake(sites)
-	send_email(foundbikes,['syassami@gmail.com','jacquelyn0lee@gmail.com'])
-	time.sleep(10800-time.time()%10800)
+def doAll():
+	if 7 < int(time.ctime()[11:13]) and int(time.ctime()[11:13]) < 23:
+		sites = ['http://santabarbara.craigslist.org/bia/','http://santamaria.craigslist.org/bia/','http://losangeles.craigslist.org/bia/','http://slo.craigslist.org/bia/','http://orangecounty.craigslist.org/bia']
+		foundbikes = scrapeAndMake(sites)
+		send_email(foundbikes,['syassami@gmail.com','jacquelyn0lee@gmail.com'])
+		threading.Timer(10800, doAll).start()
+
+doAll()
